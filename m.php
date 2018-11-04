@@ -95,8 +95,9 @@ class ReturnEngine
         # 删除标签库
         $this->tempContent = str_replace($this->importTag, '', $this->tempContent);
         #删除空行
-        $this->tempContent = preg_replace("#^\r\n#", '', $this->tempContent);
-       
+        $replace = "#^\s*$#Dm";
+        $this->tempContent = preg_replace($replace, '', $this->tempContent);
+        file_put_contents('C:\Users\return\Desktop\test.html', $this->tempContent);
         foreach($this->tagLibsName as $tagLibName)
         {
             $tagLibName = ucfirst($tagLibName);

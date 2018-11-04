@@ -14,3 +14,8 @@
  **********************************************************/
 
 require_once '.\return_engine.php';
+
+use rne\ReturnEngine;
+
+$re = new ReturnEngine('.\template.html');
+$re->parseHTML();
