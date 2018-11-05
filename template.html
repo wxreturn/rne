@@ -4,35 +4,41 @@
         <title>template</title>
     </head>
     <body>
-    <rne:list id = "1"  orderby   =  "id,desc"    limit="0, 12">
+
+<rne:list   orderby   =  " id  ,  desc "    limit="0, 10">
 <li>
-    this is contnet content<rne:title / ><rne:content /><rne:image />
+    <rne:fields.title function="substr(####, 0, 10)"/ >
+    <rne:fields.author />
+    <rne:fields.datetime />
+    <rne:fields.content />
+    <rne:fields.image />
 </li>
 </rne:list>
 
-<rne:list id = "2"  orderby   =  "id,desc"    limit="0, 12">
+<rne:list bid = "15,23,23,45,78"  orderby   =  " id  ,  desc "    limit="0, 2">
 <li>
-    this is contnet content<rne:title / ><rne:content />
+    <rne:fields.title function="substr(####, 0, 10)"/ >
+    <rne:fields.author />
+    <rne:fields.datetime />
+    <rne:fields.content />
+    <rne:fields.image />
 </li>
 </rne:list>
 
-<rne:list id = "3"  orderby   =  "id,desc"    limit="0, 12">
-<li>
-    this is contnet content<rne:title / ><rne:content />
-</li>
-</rne:list>
 
-<rne:list id = "4"  orderby   =  "id,desc"    limit="0, 12">
+<rne:list bid = "1"  orderby   =  " id  ,  desc "    >
 <li>
-    this is contnet content<rne:title / ><rne:content />
+  
 </li>
 </rne:list>
+    id int primary key auto_increment,
+    bid int not null,
+    title varchar(128) not null,
+    author varchar(32) not null,
+    description varchar(128) not null,
+    datetime datetime not null,
+    content text not null,
+    image varchar(128)
 
-<rne:list id = "5"  orderby   =  "id,desc"    limit="0, 12">
-<li>
-    this is contnet content<rne:title / ><rne:content />
-</li>
-</rne:list>
     
-    </body>
-</html>
+    SELECT `title` `author` `datetime` `image`  FROM `rne_article` where bid  = 0

@@ -1,25 +1,16 @@
 <?php
 /**********************************************************                                                                  
  *  
- *  FileName:  index.php
+ *  FileName:  common.php
  *
  *  Author:  wxreturn
  *
  *  Version:  1.0
  *
- *  DateTime:  2018年11月4日 - 下午4:24:15
+ *  DateTime:  2018年11月6日 - 上午1:08:41
  *
- *  Description:  rne测试入口文件
+ *  Description:  公共函数文件
  *
  **********************************************************/
+
 namespace rne;
-
-require_once '.\return_engine.php';
-
-
-use rne\ReturnEngine;
-
-$re = new ReturnEngine('.\template.html');
-$re->parseHTML();
-
-
