@@ -29,11 +29,12 @@ class ListTag extends TagParse
         'id',                 # 文章ID
         'bid',                # 文章所属分类ID 
         'author',             # 文章作者
-        'describe',           # 文章描述
+        'description',        # 文章描述
         'keyword',            # 文章关键词
         'image',              # 文章封面图片
         'title',              # 文章标题
-        'datetime'                # 文章日期
+        'datetime',           # 文章日期
+        'content'
     ];
     
     
@@ -45,8 +46,9 @@ class ListTag extends TagParse
         $this->tempContent = $tempContent;
     }
     
-    public function dis()
+    public function parse()
     {
-        echo $this->sqlCommand;
+        parent::parse();
+        return $this->tempContent;
     }
 }

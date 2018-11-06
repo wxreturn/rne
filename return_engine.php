@@ -115,7 +115,7 @@ class ReturnEngine
             // 生成标签库对象
             $obj = new $className($this->tempContent);
             // 执行解析过程
-            echo $obj->parse();
+            $this->tempContent =  $obj->parse();
         }
     }
     
@@ -123,5 +123,6 @@ class ReturnEngine
     {
         $this->parseTagLibsString();
         $this->importTagLibs();
+        return $this->tempContent;
     }
 }

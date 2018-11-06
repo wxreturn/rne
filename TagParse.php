@@ -50,7 +50,7 @@ class TagParse
     protected $tagName = 'list';
     
     # SQL语句 简单查询，以后完善功能
-    protected $sqlCommand = 'SELECT %FIELDS% FROM %TABLE% %WHERE% %ORDERBY% %LIMIT%';
+    protected $sqlCommand = 'SELECT %FIELDS% FROM %TABLE% %WHERE% %ORDERBY% %LIMIT%;';
     
     # 数据表名称
     protected $tableName = '';
@@ -127,7 +127,8 @@ class TagParse
            ];
            $attrListArrStr[] = preg_replace($partten, $replace, $temp);
         }
-        print_r($attrListArrStr);
+        
+        #print_r($attrListArrStr);
         
         # 属性列表数组
         $attrListArr = [];
@@ -135,8 +136,7 @@ class TagParse
         {
            $attrListArr[] = explode(' ', $temp);
         }
-        print_r($attrListArr);
-        
+
         # 将属性列表的属性名称作为键值
         foreach($attrListArr as $key=>$attrArr)
         {
@@ -146,7 +146,7 @@ class TagParse
                 $this->tagAttr[ $key ][ $attr[0] ] = $attr[1];
             }
         }
-        print_r($this->tagAttr);
+        
     }
     
     /**
@@ -169,8 +169,6 @@ class TagParse
                 die;
             }
         }        
-        print_r($this->tagFieldsData);
-        
     }
     
     /**
@@ -186,14 +184,14 @@ class TagParse
      */
     public function where($attr)
     {
-        $res = 'where bid ';
+        $res = 'WHERE `bid` IN';
         if( isset($attr['bid']) )
         {
-            $res .= 'in(' . preg_replace("#\s+#", '', $attr['bid']) . ')';
+            $res .= '(' . preg_replace("#\s+#", '', $attr['bid']) . ')';
         }
         else 
         {
-            $res .= " = 0";
+            $res .= "(0)";
         }
         return $res;
         
@@ -212,7 +210,7 @@ class TagParse
      */
     public function limit($attr)
     {
-        $res = 'limit ';
+        $res = 'LIMIT ';
         if( isset($attr['limit']) )
         {
             $res .=  preg_replace("#\s+#", '', $attr['limit']);
@@ -229,15 +227,16 @@ class TagParse
      */
     public function orderby($attr)
     {
-        $res = 'order by ';
+        $res = 'ORDER BY ';
         if( isset($attr['orderby']) )
         {
             $res .=  preg_replace("#\s*,\s*#", ' ', $attr['orderby']);
         }
         else
         {
-            $res = 'orderby id desc';
+            $res .= 'id desc';
         }
+        $res = preg_replace("#id#", '`id`', $res);
         return $res;
     }
     
@@ -277,22 +276,59 @@ class TagParse
      */
     public function createContent()
     {
+       # 解析每一个list标签的数据并生成内容
        foreach($this->tagAttr as $key=>$attr)
        {
-           $sqlCommand = $this->commbinSQL(
+          $sqlCommand = $this->commbinSQL(
                $this->fields($this->tagFieldsData[ $key ][ 1 ]), 
                $this->tableName(), 
                $this->where($attr),
                $this->orderby($attr),
                $this->limit($attr)
            );
+           // 执行SQL查询数据
+           $res = $this->mysqli->query($sqlCommand);
+           if ($res == false)
+           {
+               echo "SQL语句执行失败： " . $sqlCommand;
+               die;
+           }
+           
+           // 字段数据模板
+           $fieldsData = $this->tagDataBlock[5][$key];
+           // 保存替换的结果
+           $resFieldsData = '';
+           while( $row = $res->fetch_array() )
+           {
+               // 副本数据字段模板供替换使用
+               $fieldsDataTemp = $fieldsData;
+               
+               // 进行数据替换
+               foreach($this->tagFieldsData[$key][1] as $index=>$fieldsName)
+               {
+                   // 应用函数 执行替换前对字段应用函数 function( $row[ $this->tagFieldsData[$key][1][$index] ] )
+                   # 判断字段的函数字符串是否存在如果存在则对字段进行函数操作
+                   # 安全起见需要对函数名进行判断，可以使用的函数才能执行eval，并且参数必须满足####规范
+                   
+                   // 替换值(每一行的每一个字段)
+                   $fieldsDataTemp = str_replace(
+                        $this->tagFieldsData[$key][0][$index], 
+                        $row[ $this->tagFieldsData[$key][1][$index] ], 
+                        $fieldsDataTemp);
+               }
+               $resFieldsData .= $fieldsDataTemp;
+           }
+           // echo $resFieldsData; 
+           # 将$this->content中内容替换并且返回
+           $this->tempContent = str_replace($this->tagDataBlock[0][$key], $resFieldsData, $this->tempContent);
        }
+       // echo $this->tempContent;
     }
     
     /**
      * 
      */
-    public function commbinSQL($fields, $table, $where, $orderby, $limit)
+    protected function commbinSQL($fields, $table, $where, $orderby, $limit)
     {
         // 'SELECT %FIELDS% FROM %TABLE% %WHERE% %ORDERBY% %LIMIT%';
         $sqlCommand = $this->sqlCommand;
@@ -310,47 +346,47 @@ class TagParse
             $orderby,
             $limit
         ];
+        $sqlCommand = str_replace($search, $replace, $sqlCommand);
         
-        echo $sqlCommand = str_replace($search, $replace, $sqlCommand);
-        echo "<br/>";
         return $sqlCommand;
     }
     
     /**
      * 用来综合执行函数
      */
-    public function parse()
-    {
-        
+    protected function parse()
+    {   
+        # 标签数据库库
         $this->getDataBlock();
-        print_r($this->tagDataBlock);
+        
+        # print_r($this->tagDataBlock);
+        
+        # 标签属性列表分析
         $this->getTagAttr();
+        
+        # print_r($this->tagAttr);
+        
+        # 标签数据字段分析
         $this->getTagFieldsData();
+        
+        # print_r($this->tagFieldsData);
+        
+        # 构建数据库连接对象
         $this->SQL();
+        
+        # 产生实例
         $this->createContent();
-    }
-    
-    
-    
-    public function run()
-    {
-    
+        
     }
     
     /**
      * 数据库操作
      */
-    public function SQL()
+    protected function SQL()
     {
         $CONF = require_once('.\config.php');
-        $mysqli = new \mysqli($CONF['hostname'], $CONF['username'], $CONF['password'], $CONF['dbname']);
-        $mysqli->query("set names utf8");
-        
-//         $res = $mysqli->query("select * from rne_classify;");
-//         while($row = $res->fetch_row())
-//         {
-//             print_r($row);
-//         }
+        $this->mysqli = new \mysqli($CONF['hostname'], $CONF['username'], $CONF['password'], $CONF['dbname']);
+        $this->mysqli->query("set names utf8");
     }
 
 }
