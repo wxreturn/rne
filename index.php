@@ -15,13 +15,12 @@
 namespace rne;
 
 require_once '.\return_engine.php';
-
+require_once '\common.php';
 
 use rne\ReturnEngine;
 
-$re = new ReturnEngine('.\template.html');
+$re = new ReturnEngine('.\template.html', $url);
 echo $re->parseHTML();
-
 
 
 

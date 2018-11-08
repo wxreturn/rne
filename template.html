@@ -4,12 +4,12 @@
         <title>template</title>
     </head>
     <body>
-<rne:list   bid = '5' orderby   =  " id  ,  asc "    limit="0, 2">
+<rne:list   bid = '5,15' orderby   =  " id  ,  asc "    limit="  0  ,3">
 <li>
 数据列表开始
-    文章标题：<rne:fields.title function="substr(####, 0, 10)"/ >
+    文章标题：<rne:fields.title function="mb_substr(@refv, 0, 5)"/ >
     文章作者：<rne:fields.author />
-    发表时间：<rne:fields.datetime />
+    发表时间：<rne:fields.datetime function="mb_substr(@refv, 0, 10)"/>
     文章内容<rne:fields.content />
     文章缩略图：<rne:fields.image />
     文章描述：<rne:fields.description />
@@ -17,12 +17,12 @@
 </li>
 </rne:list>
 
-<rne:list bid = "15"  orderby   =  " id  ,  asc "    limit="0, 2">
+<rne:list bid = "15"  orderby   =  " id  ,  asc "    limit="0, 10">
 <li>
 数据列表开始
-    <rne:fields.title function="substr(####, 0, 10)"/ >
+    <rne:fields.title function="mb_substr(@refv, 0, 5)"/ >
     <rne:fields.author />
-    <rne:fields.datetime />
+    <rne:fields.datetime function="mb_substr(@refv, 0, 10)"/>
     <rne:fields.content />
     <rne:fields.image />
 数据列表结束
@@ -38,8 +38,6 @@
     content text not null,
     image varchar(128)
 
-    
-    SELECT `title` `author` `datetime` `image`  FROM `rne_article` where `bid` in(0) 
-    
+    SELECT `title`, `author`, `datetime`, `image` FROM `rne_article` where `bid` in(0) 
     </body>
 </html>

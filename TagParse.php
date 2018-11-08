@@ -279,7 +279,7 @@ class TagParse
        # 解析每一个list标签的数据并生成内容
        foreach($this->tagAttr as $key=>$attr)
        {
-          $sqlCommand = $this->commbinSQL(
+          echo $sqlCommand = $this->commbinSQL(
                $this->fields($this->tagFieldsData[ $key ][ 1 ]), 
                $this->tableName(), 
                $this->where($attr),
@@ -309,11 +309,17 @@ class TagParse
                    // 应用函数 执行替换前对字段应用函数 function( $row[ $this->tagFieldsData[$key][1][$index] ] )
                    # 判断字段的函数字符串是否存在如果存在则对字段进行函数操作
                    # 安全起见需要对函数名进行判断，可以使用的函数才能执行eval，并且参数必须满足####规范
-                   
+                   if($this->tagFieldsData[$key][4][$index] != '')
+                   {
+                        // echo "############### function:" . $this->tagFieldsData[$key][4][$index];
+                        echo $funcString = str_replace('@refv', '"'.$row[ $fieldsName ].'"',$this->tagFieldsData[$key][4][$index]);
+                         
+                        $row[ $fieldsName ] = eval("return ".$funcString.";"); 
+                   }
                    // 替换值(每一行的每一个字段)
                    $fieldsDataTemp = str_replace(
                         $this->tagFieldsData[$key][0][$index], 
-                        $row[ $this->tagFieldsData[$key][1][$index] ], 
+                        $row[ $fieldsName ], 
                         $fieldsDataTemp);
                }
                $resFieldsData .= $fieldsDataTemp;
@@ -326,7 +332,7 @@ class TagParse
     }
     
     /**
-     * 
+     * 组合SQL语句
      */
     protected function commbinSQL($fields, $table, $where, $orderby, $limit)
     {
@@ -359,17 +365,17 @@ class TagParse
         # 标签数据库库
         $this->getDataBlock();
         
-        # print_r($this->tagDataBlock);
+        print_r($this->tagDataBlock);
         
         # 标签属性列表分析
         $this->getTagAttr();
         
-        # print_r($this->tagAttr);
+        print_r($this->tagAttr);
         
         # 标签数据字段分析
         $this->getTagFieldsData();
         
-        # print_r($this->tagFieldsData);
+        print_r($this->tagFieldsData);
         
         # 构建数据库连接对象
         $this->SQL();
