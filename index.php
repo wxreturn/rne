@@ -19,7 +19,7 @@ require_once '\common.php';
 
 use rne\ReturnEngine;
 
-$re = new ReturnEngine('.\template.html', $url);
+$re = new ReturnEngine('.\template.html');
 echo $re->parseHTML();
 
 
